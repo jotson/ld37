@@ -84,6 +84,14 @@ GameState.prototype.create = function() {
     this.clockminute.angle = Math.random() * 360;
     this.clock.addChild(this.clockhour);
     this.clock.addChild(this.clockminute);
+
+    // Setup keys
+    this.keys = game.add.sprite(320, 180, 'sprites', 'key-all.png');
+    this.keys.anchor.setTo(0.5, 0.5);
+    this.keys.animations.add('struggle', ['key-left.png', 'key-right.png'], 10, true);
+    this.keys.animations.add('all', ['key-all.png'], 1, true);
+    this.keys.animations.play('struggle');
+    this.keys.alpha = 0;
 };
 
 GameState.prototype.resetGame = function() {
@@ -105,11 +113,13 @@ GameState.prototype.update = function() {
     if (this.alive) {
         if (this.crisis.active) {
             if (!G.sfx.heartbeat.isPlaying) {
-                G.sfx.heartbeat.loopFull(0.2);
+                G.sfx.heartbeat.loopFull(0);
+                game.add.tween(G.sfx.heartbeat).to({ volume: 0.6 }, 3000).start();
             }
-            // if (!G.sfx.alarm.isPlaying) {
-            //     G.sfx.alarm.loop();
-            // }
+            if (!G.sfx.alarm.isPlaying) {
+                G.sfx.alarm.loopFull(0);
+                game.add.tween(G.sfx.alarm).to({ volume: 0.5 }, 3000).start();
+            }
 
             // Read keyboard input
             if (game.input.keyboard.downDuration(Phaser.Keyboard.LEFT, 10)) {
@@ -130,27 +140,48 @@ GameState.prototype.update = function() {
             if (this.keybash.score < 0) this.keybash.score = 0;
             this.keybash.timeSinceLast += elapsed;
 
-            console.log(this.keybash.score);
+            // Play ominous heartbeat
             if (this.keybash.score < G.MIN_KEYBASH_SCORE) {
-                // TODO Play ominous heartbeat
-                G.sfx.heartbeat.volume = 1;
-                // TODO Fade alarm
+                G.sfx.heartbeat.volume = 0.6;
             } else {
-                // TODO Fade ominous heartbeat
                 G.sfx.heartbeat.volume = 0.2;
-                // TODO Play alarm
             }
 
             // End crisis
-            if (this.crisis.timeSinceLast > G.CRISIS_LENGTH && this.keybash.score > 0) {
-                this.crisis.timeSinceLast = 0;
-                this.crisis.active = false;
-                this.baseHeartrate = G.STARTING_HEART_RATE;
+            if (this.crisis.timeSinceLast > G.CRISIS_LENGTH) {
+                if (this.keybash.score > 0) {
+                    console.log('crisis averted');
+                    game.add.tween(this.keys).to({ alpha: 0 }, 500).start();
+                    this.crisis.timeSinceLast = 0;
+                    this.crisis.active = false;
+                    this.baseHeartrate = G.STARTING_HEART_RATE;
+                }
+
+                if (this.keybash.score <= 0) {
+                    console.log('...and death');
+                    game.add.tween(this.keys).to({ alpha: 0.7, x: 70, y: 310 }, 1000, Phaser.Easing.Sinusoidal.InOut).start();
+                    this.keys.animations.play('all');
+                    this.alive = false;
+
+                    // Fade out alarm sound
+                    game.add.tween(G.sfx.alarm).to({ volume: 0 }, 3000).start();
+
+                    // Fade out heartbeat sound
+                    game.add.tween(G.sfx.heartbeat).to({ volume: 0 }, 3000).start();
+
+                    // TODO Fade in ghost sound
+                    //game.add.tween(G.sfx.ghost).to({ volume: 1 }, 3000).start();
+
+                    // TODO Fade in ghost
+                    //this.ghost = game.add.sprite(0, 0, 'sprites', 'ghost.png');
+                    //game.add.tween(this.ghost).to({ opacity: 1 }, 3000).start();
+                }
             }
         }
 
         if (!this.crisis.active) {
-            // TODO Stop alarm sound
+            G.sfx.heartbeat.stop();
+            G.sfx.alarm.stop();
 
             // Heartrate
             if (this.timeToNextHeartbeat <= 0) {
@@ -174,9 +205,13 @@ GameState.prototype.update = function() {
                     this.baseHeartrate -= G.HEART_RATE_CHANGE_RATE;
 
                     if (this.baseHeartrate < G.MIN_HEART_RATE) {
-                        this.keybash.score = 10;
+                        console.log('crisis!');
+                        game.add.tween(this.keys).to({ alpha: Math.max(0, 1 - this.crisis.count/5) }, 500).start();
+                        this.keybash.score = G.MIN_KEYBASH_SCORE;
                         this.heartrate = 0;
                         this.crisis.active = true;
+                        this.crisis.timeSinceLast = 0;
+                        this.crisis.count++;
                     }
                 }
             }
@@ -189,12 +224,6 @@ GameState.prototype.update = function() {
     }
 
     if (!this.alive) {
-        // TODO Fade out alarm sound if playing
-
-        // TODO Fade in ghost sound if not playing
-
-        // TODO Fade in ghost
-
         // TODO Ghost input
 
         // TODO Ghost touching friend

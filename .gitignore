@@ -1,3 +1,5 @@
 build/
 sources/
 scrapbook/
+node_modules/
+.idea/

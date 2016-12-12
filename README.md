@@ -1,22 +1,24 @@
-# LD31
+# LD37 "One Room"
 
-This game was made for Ludum Dare 31, December 5-7 2014.
+This game was made for Ludum Dare 37, December 10-12 2016.
 
-<a href="http://jotson.itch.io/ld31" target="_new">Play it</a>
+<a href="http://jotson.itch.io/ld37" target="_new">Play it</a>
 
-Use arrow keys and spacebar to play.
+INSTRUCTIONS GO HERE
+INSTRUCTIONS GO HERE
+INSTRUCTIONS GO HERE
 
-Flamethrower has poor range when fuel is low.
-
-MELT. ALL. SNOWMEN.
-
-[Vote for my game!](http://ludumdare.com/compo/ludum-dare-31/?action=preview&uid=20128)
+[Vote for my game!]()
 
 [I'm @yafd on Twitter](http://twitter.com/yafd)
 
+
 # Build instructions
 
-The build process creates the the texture atlases, creates a minified version of the code, and creates a zip file of the packaged game. But you can also just run `grunt atlas` to regenerate the texture atlases and run the game directly from the game directory with `grunt connect`.
+The build process creates the the texture atlases, creates a minified
+version of the code, and creates a zip file of the packaged game. But
+you can also just run `grunt atlas` to regenerate the texture atlases
+and run the game directly from the game directory with `grunt connect`.
 
 Requires node and grunt.
 

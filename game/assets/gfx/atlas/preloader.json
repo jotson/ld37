@@ -1,0 +1,33 @@
+{
+	"meta": {
+		"image": "preloader.png",
+		"size": {"w":1024,"h":64},
+		"scale": "1"
+	},
+	"frames": {
+		"preloader-fg.png":
+		{
+            "frame": {"x":39,"y":8,"w":600,"h":5},
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": {"x":0,"y":0,"w":600,"h":5},
+            "sourceSize": {"w":600,"h":5}
+		},
+		"preloader-bg.png":
+		{
+            "frame": {"x":39,"y":1,"w":600,"h":5},
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": {"x":0,"y":0,"w":600,"h":5},
+            "sourceSize": {"w":600,"h":5}
+		},
+		"preloader-icon.png":
+		{
+            "frame": {"x":1,"y":1,"w":36,"h":61},
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": {"x":0,"y":0,"w":36,"h":61},
+            "sourceSize": {"w":36,"h":61}
+		}
+	}
+}

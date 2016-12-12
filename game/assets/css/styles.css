@@ -1,0 +1,11 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+html, body {
+    background-color: #000;
+    color: #fff;
+    font-family: "Roboto Condensed", sans-serif;
+}

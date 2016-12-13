@@ -4,11 +4,13 @@ This game was made for Ludum Dare 37, December 10-12 2016.
 
 <a href="http://jotson.itch.io/ld37" target="_new">Play it</a>
 
-INSTRUCTIONS GO HERE
-INSTRUCTIONS GO HERE
-INSTRUCTIONS GO HERE
+Click on the game and press SPACEBAR to start.
 
-[Vote for my game!]()
+Use the keyboard ARROW KEYS to take action.
+
+Have fun?
+
+[Vote for my game!](http://ludumdare.com/compo/ludum-dare-37/?action=preview&uid=20128)
 
 [I'm @yafd on Twitter](http://twitter.com/yafd)
 

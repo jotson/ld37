@@ -13,13 +13,13 @@ var G = {
 
     ekgGroup: null,
 
-    CRISIS_LENGTH: 3,
-    NON_CRISIS_LENGTH: 1,
-    MIN_HEART_RATE: 18,
+    CRISIS_LENGTH: 6,
+    NON_CRISIS_LENGTH: 10,
+    MIN_HEART_RATE: 8,
     STARTING_HEART_RATE: 20,
     KEYBASH_DECREASE_RATE: 5,
     MIN_KEYBASH_SCORE: 5,
-    HEART_RATE_CHANGE_RATE: 2,
+    HEART_RATE_CHANGE_RATE: 2
 };
 
 G.setupStage = function() {

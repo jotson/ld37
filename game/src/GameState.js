@@ -1,21 +1,5 @@
 var GameState = function(game) {
     this.name = 'game';
-    this.baseHeartrate = G.STARTING_HEART_RATE;
-    this.heartrate = G.STARTING_HEART_RATE;
-    this.timeToNextHeartbeat = 0;
-    this.crisis = {
-        active: false,
-        timeSinceLast: 0,
-        count: 0
-    };
-    this.alive = true;
-    this.gameover = false;
-    this.keybash = {
-        lastkey: Phaser.Keyboard.RIGHT,
-        score: 0,
-        timeSinceLast: 0
-    };
-    this.testFinalScene = true;
 };
 
 GameState.prototype.create = function() {
@@ -106,10 +90,42 @@ GameState.prototype.create = function() {
     this.ghost.alpha = 0;
     this.timeWarp = 1;
     game.physics.arcade.enable(this.ghost);
+
+    // Setup curtain
+    this.curtain =  G.addRectangle(0xffffff);
+    this.curtain.alpha = 1;
+
+    // Titles
+    this.titles = game.add.group();
+    var t = game.add.text(10, 10, 'Room 2106-B', { font: '36px ' + G.mainFont, fill: '#000000' });
+    this.titles.addChild(t);
+    var t = game.add.text(10, 60, 'by John Watson <@yafd>', { font: '20px ' + G.mainFont, fill: '#000000' })
+    this.titles.addChild(t);
+    var t = game.add.text(0, 150, 'Press [SPACE] to play', { font: '28px ' + G.mainFont, fill: '#000000' })
+    this.titles.addChild(t);
+    game.add.tween(t).to({ alpha: 0.5 }, 1000, Phaser.Easing.Sinusoidal.InOut, true, 0, 0, true).loop();
+    t.x = game.width/2 - t.width/2;
 };
 
 GameState.prototype.resetGame = function() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    this.baseHeartrate = G.STARTING_HEART_RATE;
+    this.heartrate = G.STARTING_HEART_RATE;
+    this.timeToNextHeartbeat = 0;
+    this.menu = true;
+    this.crisis = {
+        active: false,
+        timeSinceLast: 0,
+        count: 0
+    };
+    this.alive = true;
+    this.keybash = {
+        lastkey: Phaser.Keyboard.RIGHT,
+        score: 0,
+        timeSinceLast: 0
+    };
+    this.testFinalScene = false;
 };
 
 GameState.prototype.update = function() {
@@ -134,6 +150,13 @@ GameState.prototype.update = function() {
         if (Math.random() * 2 < 1) {
             this.friend.animations.play('down');
         }
+    }
+
+    if (this.menu && game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        this.menu = false;
+        game.add.tween(this.titles).to({ alpha: 0 }, 1000).start();
+        game.add.tween(this.curtain).to({ alpha: 0 }, 1000).start();
+        this.crisis.timeSinceLast = 0;
     }
 
     if (this.alive) {
@@ -234,17 +257,19 @@ GameState.prototype.update = function() {
                     blip.x = 185;
                 }
 
-                if (this.crisis.timeSinceLast > G.NON_CRISIS_LENGTH || this.crisis.count >= 3 || this.testFinalScene) {
-                    this.baseHeartrate -= G.HEART_RATE_CHANGE_RATE;
+                if (!this.menu) {
+                    if (this.crisis.timeSinceLast > G.NON_CRISIS_LENGTH || this.crisis.count >= 3 || this.testFinalScene) {
+                        this.baseHeartrate -= G.HEART_RATE_CHANGE_RATE;
 
-                    if (this.baseHeartrate < G.MIN_HEART_RATE || this.testFinalScene) {
-                        console.log('crisis!');
-                        game.add.tween(this.keys).to({ alpha: Math.max(0, 1 - this.crisis.count/5) }, 500).start();
-                        this.keybash.score = G.MIN_KEYBASH_SCORE;
-                        this.heartrate = 0;
-                        this.crisis.active = true;
-                        this.crisis.timeSinceLast = 0;
-                        this.crisis.count++;
+                        if (this.baseHeartrate < G.MIN_HEART_RATE || this.testFinalScene) {
+                            console.log('crisis!');
+                            game.add.tween(this.keys).to({ alpha: Math.max(0, 1 - this.crisis.count/5) }, 500).start();
+                            this.keybash.score = G.MIN_KEYBASH_SCORE;
+                            this.heartrate = 0;
+                            this.crisis.active = true;
+                            this.crisis.timeSinceLast = 0;
+                            this.crisis.count++;
+                        }
                     }
                 }
             }
@@ -299,8 +324,16 @@ GameState.prototype.update = function() {
             this.timeWarp = 500;
         }
 
-        // TODO Ghost up or down fade and music swell
+        // Ghost up or down fade and music swell
+        if (this.ghost.y < 100) {
+            this.curtain.alpha = (100 - Math.max(0, this.ghost.y))/100;
+        }
+        if (this.ghost.y > 260) {
+            this.curtain.alpha = (Math.min(360, this.ghost.y) - 260)/100;
+        }
 
-        // TODO Ghost off screen show "Again?"
+        if (this.ghost.y < -10 || this.ghost.y > 370) {
+            game.state.start('end');
+        }
     }
 };

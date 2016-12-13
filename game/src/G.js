@@ -5,7 +5,7 @@ var G = {
 
     sfx: {}, /* sound effects */
 
-    backgroundColor: 0x4488cc,
+    backgroundColor: 0xffffff,
     mainFont: '"Roboto Condensed"',
 
     message: null,

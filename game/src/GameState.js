@@ -108,6 +108,7 @@ GameState.prototype.create = function() {
 };
 
 GameState.prototype.resetGame = function() {
+    game.stage.backgroundColor = 0x4488cc;
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     this.baseHeartrate = G.STARTING_HEART_RATE;
@@ -126,6 +127,9 @@ GameState.prototype.resetGame = function() {
         timeSinceLast: 0
     };
     this.testFinalScene = false;
+
+    // Play music
+    G.sfx.music.loopFull(0);
 };
 
 GameState.prototype.update = function() {
@@ -326,10 +330,14 @@ GameState.prototype.update = function() {
 
         // Ghost up or down fade and music swell
         if (this.ghost.y < 100) {
-            this.curtain.alpha = (100 - Math.max(0, this.ghost.y))/100;
+            var level = (100 - Math.max(0, this.ghost.y))/100;
+            this.curtain.alpha = level;
+            G.sfx.music.volume = level * 0.5;
         }
         if (this.ghost.y > 260) {
-            this.curtain.alpha = (Math.min(360, this.ghost.y) - 260)/100;
+            var level = (Math.min(360, this.ghost.y) - 260)/100;
+            this.curtain.alpha = level;
+            G.sfx.music.volume = level * 0.5;
         }
 
         if (this.ghost.y < -10 || this.ghost.y > 370) {

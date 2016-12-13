@@ -7,11 +7,11 @@ EndState.prototype.create = function() {
 
     game.stage.backgroundColor = "#ffffff";
 
-    var t = game.add.text(0, 0, 'Again? Press [SPACE]', { font: '48px ' + G.mainFont, fill: '#000000' });
+    var t = game.add.text(0, 0, 'Again? Press [SPACE]', { font: '2 8px ' + G.mainFont, fill: '#000000' });
     t.x = game.width/2 - t.getBounds().width/2;
     t.y = game.height * 0.3;
 
-    game.add.tween(t).to({ y: t.y + 10 }, 500, Phaser.Easing.Sinusoidal.InOut, true, 0, Number.POSITIVE_INFINITY, true);
+    game.add.tween(t).to({ alpha: 0.5 }, 1000, Phaser.Easing.Sinusoidal.InOut, true, 0, 0, true).loop();
 
     game.input.onDown.add(this.restart, this);
 };

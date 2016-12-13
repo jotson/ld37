@@ -37,6 +37,7 @@ PreloadState.prototype.preload = function() {
     game.load.audio('heartbeat', ['assets/sfx/heartbeat.ogg', 'assets/sfx/heartbeat.mp3']);
     game.load.audio('alarm', ['assets/sfx/alarm.ogg', 'assets/sfx/alarm.mp3']);
     game.load.audio('ghost', ['assets/sfx/ghost.ogg', 'assets/sfx/ghost.mp3']);
+    game.load.audio('music', ['assets/sfx/music.ogg', 'assets/sfx/music.mp3']);
 };
 
 PreloadState.prototype.create = function() {
@@ -45,10 +46,9 @@ PreloadState.prototype.create = function() {
     G.sfx.heartbeat = game.add.sound('heartbeat', 0.8, false);
     G.sfx.alarm = game.add.sound('alarm', 0.8, false);
     G.sfx.ghost = game.add.sound('ghost', 0.8, false);
-    // G.sfx.music = game.add.sound('music', 0.3, true);
-    // G.sfx.music.play();
+    G.sfx.music = game.add.sound('music', 0.3, true);
 
-    game.stage.backgroundColor = G.backgroundColor;
+    game.stage.backgroundColor = 0xffffff;
 
     // Delay to allow web fonts to load
     game.add.text(10, 10, '...', { font: '6px ' + G.mainFont, fill: '#ffffff' });

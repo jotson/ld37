@@ -36,6 +36,7 @@ PreloadState.prototype.preload = function() {
     game.load.audio('ekg', ['assets/sfx/ekg.ogg', 'assets/sfx/ekg.mp3']);
     game.load.audio('heartbeat', ['assets/sfx/heartbeat.ogg', 'assets/sfx/heartbeat.mp3']);
     game.load.audio('alarm', ['assets/sfx/alarm.ogg', 'assets/sfx/alarm.mp3']);
+    game.load.audio('ghost', ['assets/sfx/ghost.ogg', 'assets/sfx/ghost.mp3']);
 };
 
 PreloadState.prototype.create = function() {
@@ -43,6 +44,7 @@ PreloadState.prototype.create = function() {
     G.sfx.ekg = game.add.sound('ekg', 0.8, false);
     G.sfx.heartbeat = game.add.sound('heartbeat', 0.8, false);
     G.sfx.alarm = game.add.sound('alarm', 0.8, false);
+    G.sfx.ghost = game.add.sound('ghost', 0.8, false);
     // G.sfx.music = game.add.sound('music', 0.3, true);
     // G.sfx.music.play();
 

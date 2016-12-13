@@ -9,11 +9,13 @@ var GameState = function(game) {
         count: 0
     };
     this.alive = true;
+    this.gameover = false;
     this.keybash = {
         lastkey: Phaser.Keyboard.RIGHT,
         score: 0,
         timeSinceLast: 0
     };
+    this.testFinalScene = true;
 };
 
 GameState.prototype.create = function() {
@@ -39,8 +41,8 @@ GameState.prototype.create = function() {
     this.friend.animations.add('down', ['friend0001.png'], 1, true);
     this.friend.animations.add('blink-right', ['friend0002.png', 'friend0003.png', 'friend0002.png'], 10, false);
     this.friend.animations.add('blink-left', ['friend0004.png', 'friend0005.png', 'friend0004.png'], 10, false);
+    this.friend.animations.add('ghost', ['friend0002.png', 'friend0004.png'], 2, true);
     this.friend.animations.play('down');
-    // TODO Animate friend
 
     // Setup ekg
     this.ekg = game.add.sprite(400, 0, 'sprites', 'ekg.png');
@@ -92,10 +94,22 @@ GameState.prototype.create = function() {
     this.keys.animations.add('all', ['key-all.png'], 1, true);
     this.keys.animations.play('struggle');
     this.keys.alpha = 0;
+
+    // Setup ghost
+    this.ghost = game.add.sprite(0, 0, 'sprites', 'ghost0001.png');
+    this.ghost.animations.add('default', Phaser.Animation.generateFrameNames('ghost', 1, 8, '.png', 4), 8, true);
+    this.ghost.animations.play('default');
+    this.ghost.scale.setTo(2,2);
+    this.ghost.anchor.setTo(0.5, 0.5);
+    this.ghost.x = 320;
+    this.ghost.y = 180;
+    this.ghost.alpha = 0;
+    this.timeWarp = 1;
+    game.physics.arcade.enable(this.ghost);
 };
 
 GameState.prototype.resetGame = function() {
-
+    game.physics.startSystem(Phaser.Physics.ARCADE);
 };
 
 GameState.prototype.update = function() {
@@ -107,8 +121,20 @@ GameState.prototype.update = function() {
     this.clouds2.tilePosition.x -= 1 * elapsed;
 
     // Clock
-    this.clockhour.angle += 0.25 * elapsed;
-    this.clockminute.angle += 0.25 * elapsed * 12;
+    this.clockhour.angle += 0.25 * elapsed * this.timeWarp;
+    this.clockminute.angle += 0.25 * elapsed * 12 * this.timeWarp;
+
+    // Animate friend
+    if (Math.random() < 0.3 * elapsed) {
+        if (Math.random() * 3 < 2) {
+            this.friend.animations.play('blink-right');
+        } else {
+            this.friend.animations.play('blink-left');
+        }
+        if (Math.random() * 2 < 1) {
+            this.friend.animations.play('down');
+        }
+    }
 
     if (this.alive) {
         if (this.crisis.active) {
@@ -147,6 +173,13 @@ GameState.prototype.update = function() {
                 G.sfx.heartbeat.volume = 0.2;
             }
 
+            if (this.testFinalScene) {
+                this.keybash.score = 0;
+                G.CRISIS_LENGTH = 0;
+                G.sfx.heartbeat.stop();
+                G.sfx.alarm.stop();
+            }
+
             // End crisis
             if (this.crisis.timeSinceLast > G.CRISIS_LENGTH) {
                 if (this.keybash.score > 0) {
@@ -159,22 +192,22 @@ GameState.prototype.update = function() {
 
                 if (this.keybash.score <= 0) {
                     console.log('...and death');
-                    game.add.tween(this.keys).to({ alpha: 0.7, x: 70, y: 310 }, 1000, Phaser.Easing.Sinusoidal.InOut).start();
+                    game.add.tween(this.keys).to({ alpha: 0.7, x: 70, y: 310 }, 1000, Phaser.Easing.Sinusoidal.InOut, false, 3000).start();
                     this.keys.animations.play('all');
                     this.alive = false;
 
                     // Fade out alarm sound
-                    game.add.tween(G.sfx.alarm).to({ volume: 0 }, 3000).start();
+                    G.sfx.alarm.stop();
 
                     // Fade out heartbeat sound
-                    game.add.tween(G.sfx.heartbeat).to({ volume: 0 }, 3000).start();
+                    game.add.tween(G.sfx.heartbeat).to({ volume: 0 }, 2000).start();
 
-                    // TODO Fade in ghost sound
-                    //game.add.tween(G.sfx.ghost).to({ volume: 1 }, 3000).start();
+                    // Fade in ghost sound
+                    G.sfx.ghost.loopFull(0);
+                    game.add.tween(G.sfx.ghost).to({ volume: 0.5 }, 5000).start();
 
-                    // TODO Fade in ghost
-                    //this.ghost = game.add.sprite(0, 0, 'sprites', 'ghost.png');
-                    //game.add.tween(this.ghost).to({ opacity: 1 }, 3000).start();
+                    // Fade in ghost
+                    game.add.tween(this.ghost).to({ alpha: 1 }, 5000).start();
                 }
             }
         }
@@ -201,10 +234,10 @@ GameState.prototype.update = function() {
                     blip.x = 185;
                 }
 
-                if (this.crisis.timeSinceLast > G.NON_CRISIS_LENGTH || this.crisis.count >= 3) {
+                if (this.crisis.timeSinceLast > G.NON_CRISIS_LENGTH || this.crisis.count >= 3 || this.testFinalScene) {
                     this.baseHeartrate -= G.HEART_RATE_CHANGE_RATE;
 
-                    if (this.baseHeartrate < G.MIN_HEART_RATE) {
+                    if (this.baseHeartrate < G.MIN_HEART_RATE || this.testFinalScene) {
                         console.log('crisis!');
                         game.add.tween(this.keys).to({ alpha: Math.max(0, 1 - this.crisis.count/5) }, 500).start();
                         this.keybash.score = G.MIN_KEYBASH_SCORE;
@@ -224,15 +257,49 @@ GameState.prototype.update = function() {
     }
 
     if (!this.alive) {
-        // TODO Ghost input
+        // Ghost input
+        if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
+            this.ghost.body.velocity.x = -60;
+        }
+        if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+            this.ghost.body.velocity.x = 60;
+        }
+        if (game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+            this.ghost.body.velocity.y = -60;
+        }
+        if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
+            this.ghost.body.velocity.y = 60;
+        }
 
-        // TODO Ghost touching friend
+        // Out of bounds
+        if (this.ghost.x < this.ghost.width/2) {
+            this.ghost.x = this.ghost.width/2 + 1;
+        }
 
-        // TODO Ghost touching ekg
+        if (this.ghost.x > 640 - this.ghost.width/2) {
+            this.ghost.x = 640 - this.ghost.width/2 - 1;
+        }
+
+        this.ghost.body.drag.setTo(30);
+
+        // Ghost touching friend
+        if (this.ghost.x < 140 && this.ghost.y > 60) {
+            this.friend.animations.play('ghost');
+        }
+
+        // Ghost touching ekg
+        this.heart.alpha = 0;
+        if (this.ghost.x > 360 && this.ghost.y < 200) {
+            this.heart.alpha = Math.random();
+        }
+
+        // Ghost touching clock
+        this.timeWarp = 1;
+        if (this.ghost.x > 290 && this.ghost.x < 400 && this.ghost.y < 140) {
+            this.timeWarp = 500;
+        }
 
         // TODO Ghost up or down fade and music swell
-
-        // TODO Block ghost from exiting left/right
 
         // TODO Ghost off screen show "Again?"
     }

@@ -7,7 +7,7 @@ EndState.prototype.create = function() {
 
     game.stage.backgroundColor = "#ffffff";
 
-    var t = game.add.text(0, 0, 'Again? Press [SPACE]', { font: '2 8px ' + G.mainFont, fill: '#000000' });
+    var t = game.add.text(0, 0, 'Again? Press [SPACE]', { font: '28px ' + G.mainFont, fill: '#000000' });
     t.x = game.width/2 - t.getBounds().width/2;
     t.y = game.height * 0.3;
 

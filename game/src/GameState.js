@@ -54,6 +54,7 @@ GameState.prototype.create = function() {
     this.bed = game.add.sprite(135, 100, 'sprites', 'bed.png');
     this.chest = game.add.sprite(166, 68, 'sprites', 'chest0000.png');
     this.chest.scale.setTo(0.7, 1);
+    this.chest.animations.add('notbreathing', ['chest0000.png'], 1, true);
     this.chest.animations.add('breathing', ['chest0000.png', 'chest0001.png', 'chest0002.png', 'chest0003.png', 'chest0004.png', 'chest0003.png', 'chest0002.png', 'chest0001.png', 'chest0000.png', 'chest0000.png'], 4, true);
     this.chest.animations.play('breathing');
     this.face = game.add.sprite(250, 45, 'sprites', 'face.png');
@@ -211,6 +212,7 @@ GameState.prototype.update = function() {
             if (this.crisis.timeSinceLast > G.CRISIS_LENGTH) {
                 if (this.keybash.score > 0) {
                     console.log('crisis averted');
+                    this.chest.animations.play('breathing');
                     game.add.tween(this.keys).to({ alpha: 0 }, 500).start();
                     this.crisis.timeSinceLast = 0;
                     this.crisis.active = false;
@@ -267,6 +269,7 @@ GameState.prototype.update = function() {
 
                         if (this.baseHeartrate < G.MIN_HEART_RATE || this.testFinalScene) {
                             console.log('crisis!');
+                            this.chest.animations.play('notbreathing');
                             game.add.tween(this.keys).to({ alpha: Math.max(0, 1 - this.crisis.count/5) }, 500).start();
                             this.keybash.score = G.MIN_KEYBASH_SCORE;
                             this.heartrate = 0;
